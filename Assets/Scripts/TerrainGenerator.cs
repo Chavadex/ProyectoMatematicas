@@ -5,10 +5,10 @@ using UnityEngine;
 [RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
 public class TerrainGenerator : MonoBehaviour
 {
-    public int gridSize = 50; // Tamaño del terreno (número de divisiones en la cuadrícula)
-    public float scale = 1f; // Escala del terreno
-    public float heightMultiplier = 2f; // Altura máxima del terreno
-    public float curveSmoothness = 1f; // Suavidad de las curvas (valores mayores hacen las curvas más suaves)
+    public int gridSize = 50; 
+    public float scale = 1f;
+    public float heightMultiplier = 2f; 
+    public float curveSmoothness = 1f; 
 
     private Mesh mesh;
     private Vector3[] vertices;
@@ -21,27 +21,25 @@ public class TerrainGenerator : MonoBehaviour
 
     void GenerateTerrain()
     {
-        // Crear el mesh y los arrays necesarios
         mesh = new Mesh();
         GetComponent<MeshFilter>().mesh = mesh;
 
         vertices = new Vector3[(gridSize + 1) * (gridSize + 1)];
         triangles = new int[gridSize * gridSize * 6];
 
-        // Generar vértices
         for (int z = 0, i = 0; z <= gridSize; z++)
         {
             for (int x = 0; x <= gridSize; x++, i++)
             {
-                // Ajustar el cálculo de altura con curveSmoothness
                 float adjustedX = x / curveSmoothness;
                 float adjustedZ = z / curveSmoothness;
-                float y = Mathf.Sin(adjustedX * scale) * Mathf.Cos(adjustedZ * scale) * heightMultiplier;
+                float y = Mathf.Sin(adjustedX * scale) * Mathf.Cos(adjustedZ * scale) * heightMultiplier; //Esta es la funcion, por si la quieren multiplicar, solo es cambiar el valor de y
+                // La funcion que esta ahorita es basicamente un y = 2 * (sen(x/10)) * (cos(z/10)). Si la cambian debe tener Sen o Cos para que el terreno sea suave y manejable, sino quedaran pendientes pronunciadas, como con la de abajo.
+                //float y = (adjustedX * adjustedX + adjustedZ * adjustedZ) * heightMultiplier;
                 vertices[i] = new Vector3(x, y, z);
             }
         }
 
-        // Generar triángulos
         int triIndex = 0;
         for (int z = 0; z < gridSize; z++)
         {
@@ -52,12 +50,10 @@ public class TerrainGenerator : MonoBehaviour
                 int topLeft = bottomLeft + gridSize + 1;
                 int topRight = topLeft + 1;
 
-                // Primer triángulo
                 triangles[triIndex] = bottomLeft;
                 triangles[triIndex + 1] = topLeft;
                 triangles[triIndex + 2] = topRight;
 
-                // Segundo triángulo
                 triangles[triIndex + 3] = bottomLeft;
                 triangles[triIndex + 4] = topRight;
                 triangles[triIndex + 5] = bottomRight;
@@ -66,12 +62,11 @@ public class TerrainGenerator : MonoBehaviour
             }
         }
 
-        // Asignar vértices y triángulos al mesh
+
         mesh.vertices = vertices;
         mesh.triangles = triangles;
-        mesh.RecalculateNormals(); // Para calcular las normales y mejorar la iluminación
+        mesh.RecalculateNormals(); 
 
-        // Agregar o actualizar el MeshCollider
         MeshCollider meshCollider = GetComponent<MeshCollider>();
         if (meshCollider == null)
         {
@@ -82,7 +77,7 @@ public class TerrainGenerator : MonoBehaviour
 
     void OnDrawGizmos()
     {
-        // Dibuja puntos para depuración (opcional)
+
         if (vertices == null) return;
         Gizmos.color = Color.red;
         foreach (var vertex in vertices)

@@ -4,22 +4,23 @@ using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    public float moveSpeed = 10f; // Velocidad base
-    public float jumpForce = 5f; // Fuerza de salto
+    public float moveSpeed = 10f; 
+    public float jumpForce = 5f; 
     private Rigidbody rb;
-    private bool isGrounded; // Para verificar si está tocando el suelo
+    [SerializeField] private bool isGrounded;
+    [SerializeField] private GameObject victoryPanel;
 
     void Start()
     {
-        // Obtener el componente Rigidbody
+        victoryPanel.SetActive(false);
         rb = GetComponent<Rigidbody>();
     }
 
     void Update()
     {
-        // Capturar input horizontal y vertical
-        float moveHorizontal = Input.GetAxis("Horizontal"); // Flechas o A/D
-        float moveVertical = Input.GetAxis("Vertical");     // Flechas o W/S
+
+        float moveHorizontal = Input.GetAxis("Horizontal"); 
+        float moveVertical = Input.GetAxis("Vertical");    
 
         // Movimiento base
         Vector3 movement = new Vector3(moveHorizontal, 0, moveVertical).normalized;
@@ -35,33 +36,38 @@ public class PlayerMovement : MonoBehaviour
         }
     }
 
-    // Función para calcular el multiplicador de velocidad en función de la pendiente
+
     private float CalculateSlopeMultiplier()
     {
-        if (!isGrounded) return 1f; // No afecta si no está en el suelo
+        if (!isGrounded) return 1f; 
 
         // Obtener la normal del suelo
         RaycastHit hit;
         if (Physics.Raycast(transform.position, Vector3.down, out hit, 1.1f))
         {
             Vector3 normal = hit.normal;
-            float angle = Vector3.Angle(normal, Vector3.up); // Ángulo con respecto al eje Y
+            float angle = Vector3.Angle(normal, Vector3.up); 
 
-            // Si el ángulo es pequeño, mantener velocidad normal; si es grande, reducir
-            if (angle < 10f) return 1f;                     // Ángulo pequeño, sin reducción
-            if (angle > 45f) return 0.3f;                   // Ángulo muy inclinado, gran reducción
-            return Mathf.Lerp(1f, 0.3f, (angle - 10f) / 35f); // Interpolación entre 10° y 45°
+          
+            if (angle < 10f) return 1f;                    
+            if (angle > 45f) return 0.3f;                   
+            return Mathf.Lerp(1f, 0.3f, (angle - 10f) / 35f); 
         }
 
-        return 1f; // Por defecto
+        return 1f; 
     }
 
-    // Detectar si está tocando el suelo
+   
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.CompareTag("Ground"))
         {
             isGrounded = true;
+        }
+
+        if (collision.gameObject.CompareTag("WinZone"))
+        {
+            victory();
         }
     }
 
@@ -71,5 +77,13 @@ public class PlayerMovement : MonoBehaviour
         {
             isGrounded = false;
         }
+    }
+
+    
+
+    private void victory()
+    {
+        Debug.Log("Winning");
+        victoryPanel.SetActive(true);
     }
 }
