@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Ground
   - WinZone
+  - Coin
   layers:
   - Default
   - TransparentFX
